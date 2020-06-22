@@ -5,12 +5,12 @@ metadata:
   labels: 
     name: mysql
 spec:
+  type: NodePort
   ports:
     - port: 3306
   selector:
     name: private-mariadb
     tier: mysql
-  clusterIP: None
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,7 +42,13 @@ spec:
         volumeMounts:
         - name: private-mariadb-pv
           mountPath: var/lib/mariadb
+        - name: config
+          mountPath: etc/mysql
+          readOnly: true
       volumes:
       - name: private-mariadb-pv
         persistentVolumeClaim:
           claimName: private-mariadb-pvc
+      - name: config
+        configMap:
+          name: mysql-config
