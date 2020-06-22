@@ -1,0 +1,31 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: private-jenkins-pv
+  labels:
+    type: jenkins
+spec:
+  storageClassName: jenkins
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/var/jenkins_home"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: private-jenkins-pvc
+spec:
+  storageClassName: jenkins
+  volumeName: private-jenkins-pv
+  accessModes:
+    - ReadWriteMany
+  selector:
+    matchLabels:
+      type: local
+  resources:
+    requests:
+      storage: 8Gi

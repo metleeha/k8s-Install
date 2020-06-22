@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: private-mariadb
+  labels: 
+    name: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    name: private-mariadb
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: private-mariadb
+spec:
+  selector:
+    matchLabels:
+      name: private-mariadb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: private-mariadb
+        tier: mysql
+    spec:
+      containers:
+      - image: mariadb:latest
+        name: mariadb
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: private-mariadb-pass-96cddf227t
+              key: password
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: private-mariadb-pv
+          mountPath: var/lib/mariadb
+      volumes:
+      - name: private-mariadb-pv
+        persistentVolumeClaim:
+          claimName: private-mariadb-pvc

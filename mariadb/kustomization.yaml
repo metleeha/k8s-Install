@@ -1,0 +1,5 @@
+secretGenerator:
+- name: private-mariadb-pass
+  literals:
+  - username=root
+  - password=passw0rd
